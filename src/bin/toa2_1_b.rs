@@ -43,6 +43,12 @@ struct Point {
     y: i64,
 }
 
+#[derive(Copy, Clone, Debug)]
+struct Interval<'a, 'b> {
+    first: &'a Point,
+    second: &'b Point,
+}
+
 fn distance(first: &Point, second: &Point) -> i64 {
     (first.x - second.x).pow(2) + (first.y - second.y).pow(2)
 }
@@ -56,13 +62,33 @@ fn sort_points(points: &mut [Point; 4]) {
     }
 }
 
+fn is_parallels(interval1: Interval, interval2: Interval) -> bool {
+    let side1 = Point {x: interval1.second.x - interval1.first.x, 
+                       y: interval1.second.y - interval1.first.y};
+    let side2 = Point {x: interval2.second.x - interval2.first.x, 
+                       y: interval2.second.y - interval2.first.y};
+    if side1.y * side2.x != side1.x * side2.y {
+        return false;
+    }
+    true
+}
+
 fn is_parallelogram(points: &mut [Point; 4]) -> bool {
     sort_points(points);
 
     if distance(&points[0], &points[1]) != distance(&points[2], &points[3]) {
         return false;
     }
+    if !is_parallels(Interval {first: &points[0], second: &points[1]}, 
+                     Interval {first: &points[2], second: &points[3]}){
+        return false;
+    }
+
     if distance(&points[0], &points[3]) != distance(&points[1], &points[2]) {
+        return false;
+    }
+    if !is_parallels(Interval {first: &points[0], second: &points[3]}, 
+                     Interval {first: &points[1], second: &points[2]}){
         return false;
     }
 
