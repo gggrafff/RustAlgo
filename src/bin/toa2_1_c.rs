@@ -61,6 +61,95 @@ YES
 
 */
 
+fn check_win(field: [[u8; 3]; 3], player: u8) -> bool {
+    for i in 0..3 {
+        let mut success = true;
+        for j in 0..3 {
+            if field[i][j] != player {
+                success = false;
+                break;
+            }
+        }
+        if success {
+            return true;
+        }
+    }
+
+    for i in 0..3 {
+        let mut success = true;
+        for j in 0..3 {
+            if field[j][i] != player {
+                success = false;
+                break;
+            }
+        }
+        if success {
+            return true;
+        }
+    }
+
+    {
+        let mut success = true;
+        for j in 0..3 {
+            if field[j][j] != player {
+                success = false;
+                break;
+            }
+        }
+        if success {
+            return true;
+        }
+    }
+
+    {
+        let mut success = true;
+        for j in 0..3 {
+            if field[j][2 - j] != player {
+                success = false;
+                break;
+            }
+        }
+        if success {
+            return true;
+        }
+    }
+
+    false
+}
+
+fn is_correct(field: [[u8; 3]; 3]) -> bool {
+    let mut count_x: u8 = 0;
+    let mut count_o: u8 = 0;
+    for i in 0..3 {
+        for j in 0..3 {
+            if field[i][j] == 1 {
+                count_x += 1;
+            } else if field[i][j] == 2 {
+                count_o += 1;
+            }
+        }
+    }
+
+    if count_o > count_x {
+        return false;
+    }
+    if count_o + 1 < count_x {
+        return false;
+    }
+
+    if count_x == count_o {
+        if check_win(field, 1) {
+            return false;
+        }
+    } else {
+        if check_win(field, 2) {
+            return false;
+        }
+    }
+
+    true
+}
+
 fn get_input() -> String {
     let mut buffer = String::new();
     std::io::stdin().read_line(&mut buffer).expect("Failed");
@@ -76,5 +165,16 @@ mod tests {
 }
 
 fn main() {
-    
+    let mut field = [[0u8; 3]; 3];
+    for i in 0..3 {
+        let line: Vec<u8> = get_input().trim().split_whitespace().map(|s| s.parse::<u8>().unwrap()).collect();
+        field[i][0] = line[0];
+        field[i][1] = line[1];
+        field[i][2] = line[2];
+    }
+    if is_correct(field) {
+        println!("YES");
+    } else {
+        println!("NO");
+    }
 }
